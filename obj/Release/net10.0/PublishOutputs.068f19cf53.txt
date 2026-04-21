@@ -1,0 +1,9 @@
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\SimulatorProject.exe
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\_buildcheck\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\_buildcheck\SimulatorProject.runtimeconfig.json
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\_buildcheck\SimulatorProject.staticwebassets.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\_buildcheck\SimulatorProject.staticwebassets.runtime.json
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\SimulatorProject.dll
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\SimulatorProject.runtimeconfig.json
+D:\Home\SimulatorProject\SimulatorProject\_azure_publish_test\SimulatorProject.pdb
