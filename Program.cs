@@ -1,26 +1,31 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
+var configuredOrigins = builder.Configuration["Cors:AllowedOrigins"];
+var allowedOrigins = (configuredOrigins ?? string.Empty)
+    .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+var defaultDevOrigins = new[]
+{
+    "http://localhost:5000",
+    "https://localhost:5001",
+    "http://127.0.0.1:5000",
+    "https://127.0.0.1:5001"
+};
+
+var effectiveOrigins = allowedOrigins.Length > 0 ? allowedOrigins : defaultDevOrigins;
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("LocalDev", policy =>
+    options.AddPolicy("AppCors", policy =>
     {
         policy
-            .SetIsOriginAllowed(origin =>
-            {
-                if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
-                {
-                    return false;
-                }
-
-                return uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
-                    || uri.Host.Equals("127.0.0.1");
-            })
+            .WithOrigins(effectiveOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 var app = builder.Build();
 
-app.UseCors("LocalDev");
+app.UseCors("AppCors");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
