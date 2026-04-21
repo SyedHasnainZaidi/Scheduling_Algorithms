@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheduling Algorithms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0f172a;
+      --bg-2: #111827;
+      --panel: rgba(17, 24, 39, 0.86);
+      --line: rgba(148, 163, 184, 0.25);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22d3ee;
+      --accent-2: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 15%, rgba(34, 211, 238, 0.18), transparent 35%),
+        radial-gradient(circle at 90% 10%, rgba(245, 158, 11, 0.14), transparent 35%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(880px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      backdrop-filter: blur(8px);
+      padding: 24px;
+      box-shadow: 0 24px 40px rgba(0, 0, 0, 0.35);
+      animation: riseIn 500ms ease-out;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    form {
+      margin-top: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .row {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+    }
+
+    input, select, button {
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.75);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(34, 211, 238, 0.45);
+      outline-offset: 1px;
+    }
+
+    .extra {
+      display: none;
+      animation: fadeIn 280ms ease-out;
+    }
+
+    .extra.active {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #0f172a;
+      border: none;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    .error {
+      margin-top: 14px;
+      color: var(--danger);
+      min-height: 24px;
+      font-weight: 500;
+    }
+
+    .results {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .result-item {
+      border: 1px solid var(--line);
+      background: rgba(2, 6, 23, 0.45);
+      border-radius: 12px;
+      padding: 10px;
+      animation: fadeIn 280ms ease-out;
+    }
+
+    .result-key {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .result-value {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 1.05rem;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 760px) {
+      .row,
+      .extra.active,
+      .results {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 18px;
+      }
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Scheduling Algorithms</h1>
+    <p class="subtitle">Choose server type, select a model, and compute queue performance instantly.</p>
+
+    <form id="queueForm">
+      <div class="row">
+        <div class="field">
+          <label for="serverType">Server Type</label>
+          <select id="serverType" name="serverType" required>
+            <option value="single" selected>Single Server</option>
+            <option value="multi">Multi Server</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="model">Queue Model</label>
+          <select id="model" name="model" required>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="unit">Time Unit</label>
+          <select id="unit" name="unit" required>
+            <option value="sec">Seconds</option>
+            <option value="min">Minutes</option>
+            <option value="hr" selected>Hours</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="lambda">Arrival Rate (lambda) per selected unit</label>
+          <input id="lambda" name="lambda" type="number" min="0" step="any" required>
+        </div>
+
+        <div class="field">
+          <label for="mu">Service Rate (mu) per selected unit</label>
+          <input id="mu" name="mu" type="number" min="0" step="any" required>
+        </div>
+      </div>
+
+      <section id="multiFields" class="extra" aria-label="Multi server specific inputs">
+        <div class="field">
+          <label for="servers">Number of Servers</label>
+          <input id="servers" name="servers" type="number" min="1" step="1">
+        </div>
+
+        <div class="field" id="cs2Field">
+          <label for="cs2">Service Time Squared Coefficient (Cs^2) for M/G/c</label>
+          <input id="cs2" name="cs2" type="number" min="0" step="any">
+        </div>
+      </section>
+
+      <section id="mg1Fields" class="extra" aria-label="M G 1 specific inputs">
+        <div class="field">
+          <label for="variance">Service Time Variance (sigma squared), in hr^2</label>
+          <input id="variance" name="variance" type="number" min="0" step="any">
+        </div>
+      </section>
+
+      <section id="gg1Fields" class="extra" aria-label="G G 1 specific inputs">
+        <div class="field">
+          <label for="ca">Arrival Variation (Ca)</label>
+          <input id="ca" name="ca" type="number" min="0" step="any">
+        </div>
+
+        <div class="field">
+          <label for="cs">Service Variation (Cs)</label>
+          <input id="cs" name="cs" type="number" min="0" step="any">
+        </div>
+      </section>
+
+      <button type="submit">Run Simulation</button>
+    </form>
+
+    <div class="error" id="error"></div>
+    <section class="results" id="results"></section>
+  </main>
+
+  <script>
+    const MODEL_OPTIONS = {
+      single: [
+        { value: "mm1", label: "M/M/1" },
+        { value: "mg1", label: "M/G/1" },
+        { value: "gg1", label: "G/G/1" }
+      ],
+      multi: [
+        { value: "mms", label: "M/M/s" },
+        { value: "mgc", label: "M/G/c" }
+      ]
+    };
+
+    const serverTypeSelect = document.getElementById("serverType");
+    const modelSelect = document.getElementById("model");
+    const multiFields = document.getElementById("multiFields");
+    const cs2Field = document.getElementById("cs2Field");
+    const mg1Fields = document.getElementById("mg1Fields");
+    const gg1Fields = document.getElementById("gg1Fields");
+    const form = document.getElementById("queueForm");
+    const errorBox = document.getElementById("error");
+    const resultsBox = document.getElementById("results");
+
+    const serversInput = document.getElementById("servers");
+    const cs2Input = document.getElementById("cs2");
+    const varianceInput = document.getElementById("variance");
+    const caInput = document.getElementById("ca");
+    const csInput = document.getElementById("cs");
+
+    function buildApiCandidates() {
+      const sameOrigin = `${window.location.origin}/api/calculate`;
+      const localhostFallback = "http://localhost:5000/api/calculate";
+
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        if (window.location.port === "5000") {
+          return [sameOrigin];
+        }
+
+        return [sameOrigin, localhostFallback];
+      }
+
+      return [sameOrigin];
+    }
+
+    function refreshModels() {
+      const options = MODEL_OPTIONS[serverTypeSelect.value] ?? MODEL_OPTIONS.single;
+      const selected = modelSelect.value;
+
+      modelSelect.innerHTML = options
+        .map((option) => `<option value="${option.value}">${option.label}</option>`)
+        .join("");
+
+      if (options.some((option) => option.value === selected)) {
+        modelSelect.value = selected;
+      }
+    }
+
+    function refreshModelInputs() {
+      const serverType = serverTypeSelect.value;
+      const model = modelSelect.value;
+
+      multiFields.classList.toggle("active", serverType === "multi");
+      cs2Field.style.display = model === "mgc" ? "flex" : "none";
+      mg1Fields.classList.toggle("active", model === "mg1");
+      gg1Fields.classList.toggle("active", model === "gg1");
+
+      serversInput.required = serverType === "multi";
+      cs2Input.required = model === "mgc";
+      varianceInput.required = model === "mg1";
+      caInput.required = model === "gg1";
+      csInput.required = model === "gg1";
+    }
+
+    function renderResults(data, serverType) {
+      const unit = data.unit ?? data.Unit ?? "hr";
+      const category = serverType === "multi" ? "Multi Server" : "Single Server";
+      const rows = [
+        ["Category", category],
+        ["Model", data.model ?? data.Model],
+        ["Utilization (rho)", data.rho ?? data.Rho],
+        ["L", data.l ?? data.L],
+        ["Lq", data.lq ?? data.Lq],
+        ["W", `${data.w ?? data.W} ${unit}`],
+        ["Wq", `${data.wq ?? data.Wq} ${unit}`]
+      ];
+
+      resultsBox.innerHTML = rows
+        .map(([k, v]) => `
+          <article class="result-item">
+            <span class="result-key">${k}</span>
+            <span class="result-value">${v}</span>
+          </article>
+        `)
+        .join("");
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      errorBox.textContent = "";
+      resultsBox.innerHTML = "";
+
+      const payload = {
+        model: modelSelect.value,
+        unit: document.getElementById("unit").value,
+        lambda: Number(document.getElementById("lambda").value),
+        mu: Number(document.getElementById("mu").value),
+        servers: serversInput.value ? Number(serversInput.value) : null,
+        cs2: cs2Input.value ? Number(cs2Input.value) : null,
+        variance: varianceInput.value ? Number(varianceInput.value) : null,
+        ca: caInput.value ? Number(caInput.value) : null,
+        cs: csInput.value ? Number(csInput.value) : null
+      };
+
+      try {
+        const apiCandidates = buildApiCandidates();
+        let res = null;
+        for (const apiUrl of apiCandidates) {
+          const attempt = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (attempt.ok || (attempt.status !== 404 && attempt.status !== 405)) {
+            res = attempt;
+            break;
+          }
+
+          res = attempt;
+        }
+
+        const raw = await res.text();
+        let data = null;
+
+        if (raw) {
+          try {
+            data = JSON.parse(raw);
+          } catch {
+            data = null;
+          }
+        }
+
+        if (!res.ok) {
+          const message =
+            data?.error ||
+            data?.title ||
+            (raw ? raw : `Request failed with status ${res.status}.`);
+          throw new Error(message);
+        }
+
+        if (!data) {
+          throw new Error("Server returned an empty response.");
+        }
+
+        renderResults(data, serverTypeSelect.value);
+      } catch (err) {
+        errorBox.textContent = err.message;
+      }
+    });
+
+    serverTypeSelect.addEventListener("change", () => {
+      refreshModels();
+      refreshModelInputs();
+    });
+    modelSelect.addEventListener("change", refreshModelInputs);
+    refreshModels();
+    refreshModelInputs();
+  </script>
+</body>
+</html>

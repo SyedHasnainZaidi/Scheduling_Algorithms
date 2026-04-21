@@ -1,0 +1,53 @@
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\bin\Debug\net10.0\SimulatorProject.exe
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\bin\Debug\net10.0\SimulatorProject.deps.json
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\bin\Debug\net10.0\SimulatorProject.runtimeconfig.json
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\bin\Debug\net10.0\SimulatorProject.dll
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\bin\Debug\net10.0\SimulatorProject.pdb
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.AssemblyInfoInputs.cache
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.AssemblyInfo.cs
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.csproj.CoreCompileInputs.cache
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.dll
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\refint\SimulatorProject.dll
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.pdb
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\SimulatorProject.genruntimeconfig.cache
+C:\Users\User\OneDrive\Desktop\University of Karachi\7th-Sem\Toci- II (Dr. Shaista)\SimulatorProject\obj\Debug\net10.0\ref\SimulatorProject.dll
+d:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.exe
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.runtimeconfig.json
+d:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.dll
+d:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.pdb
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.GeneratedMSBuildEditorConfig.editorconfig
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.AssemblyInfoInputs.cache
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.AssemblyInfo.cs
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.csproj.CoreCompileInputs.cache
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.dll
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\refint\SimulatorProject.dll
+d:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.pdb
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.genruntimeconfig.cache
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\ref\SimulatorProject.dll
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.staticwebassets.runtime.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\SimulatorProject.staticwebassets.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\rpswa.dswa.cache.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.MvcApplicationPartsAssemblyInfo.cache
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\rjimswa.dswa.cache.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\scopedcss\bundle\SimulatorProject.styles.css
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\staticwebassets.build.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\staticwebassets.build.json.cache
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\staticwebassets.development.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\staticwebassets.build.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\swae.build.ex.cache
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.staticwebassets.runtime.json
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.staticwebassets.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.exe
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.runtimeconfig.json
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.dll
+D:\Home\SimulatorProject\SimulatorProject\_buildcheck\SimulatorProject.pdb
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.runtimeconfig.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.staticwebassets.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.staticwebassets.runtime.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\compressed\g7db6acdca-{0}-8luipy1v9q-8luipy1v9q.gz
