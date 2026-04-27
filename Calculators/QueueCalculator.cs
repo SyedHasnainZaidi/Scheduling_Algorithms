@@ -15,9 +15,9 @@ public static class QueueCalculator
         return MM1ModelCalculator.Calculate(lambda, mu, unit);
     }
 
-    public static CalculationResponse CalculateMg1(double lambda, double mu, double varianceHoursSquared, string unit)
+    public static CalculationResponse CalculateMg1(double lambda, double meanServiceHours, double varianceHoursSquared, string unit)
     {
-        return MG1ModelCalculator.Calculate(lambda, mu, varianceHoursSquared, unit);
+        return MG1ModelCalculator.Calculate(lambda, meanServiceHours, varianceHoursSquared, unit);
     }
 
     public static CalculationResponse CalculateGg1(double lambda, double mu, double ca, double cs, string unit)

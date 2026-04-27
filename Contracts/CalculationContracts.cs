@@ -4,6 +4,13 @@ public record CalculationRequest(
     double Mu,
     string Unit,
     double? Variance,
+    double? MinServiceTime,
+    double? MaxServiceTime,
+    string? Mg1Distribution,
+    double? Mg1MeanServiceTime,
+    double? Mg1Variance,
+    double? Mg1MinServiceTime,
+    double? Mg1MaxServiceTime,
     double? Ca,
     double? Cs,
     int? Servers,
@@ -18,5 +25,7 @@ public record CalculationResponse(
     double Lq,
     double W,
     double Wq,
+    double? MeanServiceTime,
+    double? Variance,
     string Unit
 );

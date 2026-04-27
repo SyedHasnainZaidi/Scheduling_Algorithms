@@ -1,25 +1,29 @@
 public static class MGCModelCalculator
 {
-    public static CalculationResponse Calculate(double lambda, double mu, int servers, double cs2, string unit)
+    public static CalculationResponse Calculate(double lambda, double mu, int servers, double cs, string unit)
     {
         var rho = lambda / (servers * mu);
-        var exponent = Math.Sqrt(2 * (servers + 1)) - 1;
-        var wq = ((cs2 + 1) / 2.0) *
-                 (Math.Pow(rho, exponent) / (servers * (1 - rho))) *
-                 (1 / mu);
+        var alpha = lambda / mu;
+        var p0 = QueueMath.CalculateP0Mmc(lambda, mu, servers);
 
-        var lq = lambda * wq;
+        var lqMm = (p0 * Math.Pow(alpha, servers) * rho) /
+                   (QueueMath.Factorial(servers) * Math.Pow(1 - rho, 2));
+
+        var lq = lqMm * ((1 + cs) / 2.0);
+        var wq = lq / lambda;
         var w = wq + (1 / mu);
         var l = lambda * w;
 
         return new CalculationResponse(
             "M/G/c",
             Math.Round(rho, 3),
-            null,
+            Math.Round(p0, 3),
             Math.Round(l, 3),
             Math.Round(lq, 3),
             Math.Round(QueueUnitConverter.FromHours(w, unit), 3),
             Math.Round(QueueUnitConverter.FromHours(wq, unit), 3),
+            null,
+            null,
             unit
         );
     }

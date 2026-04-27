@@ -17,6 +17,8 @@ public static class MM1ModelCalculator
             Math.Round(lq, 3),
             Math.Round(QueueUnitConverter.FromHours(w, unit), 3),
             Math.Round(QueueUnitConverter.FromHours(wq, unit), 3),
+            null,
+            null,
             unit
         );
     }

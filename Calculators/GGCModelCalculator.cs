@@ -5,14 +5,7 @@ public static class GGCModelCalculator
         var rho = lambda / (servers * mu);
         var alpha = lambda / mu;
 
-        var sum = 0.0;
-        for (var n = 0; n < servers; n++)
-        {
-            sum += Math.Pow(alpha, n) / QueueMath.Factorial(n);
-        }
-
-        var tail = Math.Pow(alpha, servers) / (QueueMath.Factorial(servers) * (1 - rho));
-        var p0 = 1 / (sum + tail);
+        var p0 = QueueMath.CalculateP0Mmc(lambda, mu, servers);
 
         var lqMm = (p0 * Math.Pow(alpha, servers) * rho) /
                    (QueueMath.Factorial(servers) * Math.Pow(1 - rho, 2));
@@ -31,6 +24,8 @@ public static class GGCModelCalculator
             Math.Round(lq, 3),
             Math.Round(QueueUnitConverter.FromHours(w, unit), 3),
             Math.Round(QueueUnitConverter.FromHours(wq, unit), 3),
+            null,
+            null,
             unit
         );
     }

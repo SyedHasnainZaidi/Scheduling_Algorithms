@@ -1,4 +1,6 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+using SimulatorFinalProject.Simulator.Services;
+
+var builder = WebApplication.CreateBuilder(args);
 var configuredOrigins = builder.Configuration["Cors:AllowedOrigins"];
 var allowedOrigins = (configuredOrigins ?? string.Empty)
     .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -23,12 +25,16 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+builder.Services.AddControllers();
+builder.Services.AddScoped<SimulationService>();
+
 var app = builder.Build();
 
 app.UseCors("AppCors");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.MapControllers();
 app.MapPost("/api/calculate", (CalculationRequest request) =>
 {
     if (request.Lambda <= 0 || request.Mu <= 0)
@@ -55,26 +61,83 @@ app.MapPost("/api/calculate", (CalculationRequest request) =>
             response = QueueCalculator.CalculateMm1(lambda, mu, request.Unit);
             break;
         case "mg1":
-            if (!request.Variance.HasValue || request.Variance.Value < 0)
+            if (string.IsNullOrWhiteSpace(request.Mg1Distribution))
             {
-                return Results.BadRequest(new { error = "M/G/1 requires a non-negative service time variance." });
+                return Results.BadRequest(new { error = "M/G/1 requires a service distribution selection." });
             }
-            if (lambda / mu >= 1)
+            var mg1Distribution = request.Mg1Distribution.Trim().ToLowerInvariant();
+            double meanServiceHours;
+            double varianceHoursSquared;
+
+            switch (mg1Distribution)
+            {
+                case "exponential":
+                    if (!request.Mg1MeanServiceTime.HasValue || request.Mg1MeanServiceTime.Value <= 0)
+                    {
+                        return Results.BadRequest(new { error = "M/G/1 exponential requires a positive mean service time." });
+                    }
+
+                    meanServiceHours = QueueUnitConverter.ToHours(request.Mg1MeanServiceTime.Value, request.Unit);
+                    varianceHoursSquared = Math.Pow(meanServiceHours, 2);
+                    break;
+                case "uniform":
+                    if (!request.Mg1MinServiceTime.HasValue || !request.Mg1MaxServiceTime.HasValue)
+                    {
+                        return Results.BadRequest(new { error = "M/G/1 uniform requires min and max service time values." });
+                    }
+
+                    if (request.Mg1MinServiceTime.Value < 0 || request.Mg1MaxServiceTime.Value < 0 || request.Mg1MaxServiceTime.Value < request.Mg1MinServiceTime.Value)
+                    {
+                        return Results.BadRequest(new { error = "M/G/1 uniform requires min/max service time values with max >= min and both non-negative." });
+                    }
+
+                    var minServiceHours = QueueUnitConverter.ToHours(request.Mg1MinServiceTime.Value, request.Unit);
+                    var maxServiceHours = QueueUnitConverter.ToHours(request.Mg1MaxServiceTime.Value, request.Unit);
+                    meanServiceHours = (minServiceHours + maxServiceHours) / 2.0;
+                    varianceHoursSquared = Math.Pow(maxServiceHours - minServiceHours, 2) / 12.0;
+                    break;
+                case "general":
+                    if (!request.Mg1MeanServiceTime.HasValue || !request.Mg1Variance.HasValue)
+                    {
+                        return Results.BadRequest(new { error = "M/G/1 general requires mean and variance values." });
+                    }
+
+                    if (request.Mg1MeanServiceTime.Value <= 0 || request.Mg1Variance.Value < 0)
+                    {
+                        return Results.BadRequest(new { error = "M/G/1 general requires positive mean and non-negative variance." });
+                    }
+
+                    meanServiceHours = QueueUnitConverter.ToHours(request.Mg1MeanServiceTime.Value, request.Unit);
+                    varianceHoursSquared = QueueUnitConverter.ToHoursSquared(request.Mg1Variance.Value, request.Unit);
+                    break;
+                default:
+                    return Results.BadRequest(new { error = "M/G/1 requires a valid service distribution selection." });
+            }
+
+            var muFromMean = 1 / meanServiceHours;
+            if (lambda / muFromMean >= 1)
             {
                 return Results.BadRequest(new { error = "System is unstable because utilization (rho) is greater than or equal to 1." });
             }
-            response = QueueCalculator.CalculateMg1(lambda, mu, QueueCalculator.ToHoursSquared(request.Variance.Value, request.Unit), request.Unit);
+
+            response = QueueCalculator.CalculateMg1(lambda, meanServiceHours, varianceHoursSquared, request.Unit);
             break;
         case "gg1":
             if (!request.Ca.HasValue || !request.Cs.HasValue || request.Ca.Value < 0 || request.Cs.Value < 0)
             {
-                return Results.BadRequest(new { error = "G/G/1 requires non-negative Ca and Cs values." });
+                return Results.BadRequest(new { error = "G/G/1 requires non-negative arrival/service variance values." });
             }
             if (lambda / mu >= 1)
             {
                 return Results.BadRequest(new { error = "System is unstable because utilization (rho) is greater than or equal to 1." });
             }
-            response = QueueCalculator.CalculateGg1(lambda, mu, request.Ca.Value, request.Cs.Value, request.Unit);
+            response = QueueCalculator.CalculateGg1(
+                lambda,
+                mu,
+                QueueCalculator.ToHoursSquared(request.Ca.Value, request.Unit),
+                QueueCalculator.ToHoursSquared(request.Cs.Value, request.Unit),
+                request.Unit
+            );
             break;
         case "mms":
             if (!request.Servers.HasValue || request.Servers.Value <= 0)
@@ -94,7 +157,7 @@ app.MapPost("/api/calculate", (CalculationRequest request) =>
             }
             if (!request.Cs2.HasValue || request.Cs2.Value < 0)
             {
-                return Results.BadRequest(new { error = "M/G/c requires a non-negative Cs^2 value." });
+                return Results.BadRequest(new { error = "M/G/c requires a non-negative Cs value." });
             }
             if (lambda / (request.Servers.Value * mu) >= 1)
             {

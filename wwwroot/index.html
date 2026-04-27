@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scheduling Algorithms</title>
+  <title>Bin Hashim Queueing and Simulator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-1: #0f172a;
+      --bg-1: #08101f;
       --bg-2: #111827;
-      --panel: rgba(17, 24, 39, 0.86);
-      --line: rgba(148, 163, 184, 0.25);
+      --panel: rgba(15, 23, 42, 0.9);
+      --panel-2: rgba(15, 23, 42, 0.65);
+      --line: rgba(148, 163, 184, 0.24);
       --text: #e5e7eb;
       --muted: #94a3b8;
       --accent: #22d3ee;
       --accent-2: #f59e0b;
-      --danger: #ef4444;
+      --success: #34d399;
+      --danger: #f87171;
     }
 
     * {
@@ -30,46 +32,153 @@
       font-family: "Space Grotesk", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 10% 15%, rgba(34, 211, 238, 0.18), transparent 35%),
-        radial-gradient(circle at 90% 10%, rgba(245, 158, 11, 0.14), transparent 35%),
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(245, 158, 11, 0.15), transparent 28%),
         linear-gradient(145deg, var(--bg-1), var(--bg-2));
-      display: grid;
-      place-items: center;
       padding: 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .app-shell {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
     }
 
     .card {
-      width: min(880px, 100%);
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 18px;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 24px 40px rgba(0, 0, 0, 0.3);
       padding: 24px;
-      box-shadow: 0 24px 40px rgba(0, 0, 0, 0.35);
-      animation: riseIn 500ms ease-out;
+      animation: riseIn 420ms ease-out;
+    }
+
+    .hero {
+      display: grid;
+      gap: 32px;
+      align-content: center;
+      min-height: min(72vh, 640px);
+      justify-items: center;
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: 1.1;
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
-      letter-spacing: 0.02em;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      max-width: 24ch;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
     }
 
     .subtitle {
-      margin-top: 8px;
+      margin: 0;
       color: var(--muted);
+      max-width: 68ch;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: stretch;
+      width: min(100%, 980px);
+      margin-top: 12px;
+    }
+
+    .choice-btn,
+    .back-btn,
+    .submit-btn {
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: #0f172a;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-weight: 700;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    .choice-btn:hover,
+    .back-btn:hover,
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    .choice-btn {
+      text-align: center;
+      padding: 20px;
+      display: grid;
+      gap: 8px;
+      min-height: 72px;
+      align-items: center;
+    }
+
+    .choice-btn span {
+      display: block;
+    }
+
+    .choice-btn small {
+      color: rgba(15, 23, 42, 0.82);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .section-heading {
+      display: grid;
+      gap: 6px;
+      align-content: center;
+    }
+
+    .section-subtitle {
+      margin-bottom: 14px;
     }
 
     form {
-      margin-top: 22px;
       display: grid;
       gap: 16px;
     }
 
     .row {
       display: grid;
-      gap: 14px;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .field {
@@ -78,14 +187,18 @@
       gap: 6px;
     }
 
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
     label {
       font-size: 0.92rem;
       color: #cbd5e1;
     }
 
-    input, select, button {
+    input, select {
       border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(2, 6, 23, 0.5);
       color: var(--text);
       border-radius: 12px;
       padding: 11px 12px;
@@ -99,7 +212,7 @@
 
     .extra {
       display: none;
-      animation: fadeIn 280ms ease-out;
+      animation: fadeIn 220ms ease-out;
     }
 
     .extra.active {
@@ -108,40 +221,40 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    button {
-      cursor: pointer;
-      font-weight: 700;
-      background: linear-gradient(120deg, var(--accent), var(--accent-2));
-      color: #0f172a;
-      border: none;
-      transition: transform 120ms ease, filter 120ms ease;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.03);
+    .note {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel-2);
+      padding: 14px 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
 
     .error {
-      margin-top: 14px;
-      color: var(--danger);
       min-height: 24px;
+      margin-top: 8px;
+      color: var(--danger);
       font-weight: 500;
     }
 
-    .results {
+    .results,
+    .summary-grid {
       margin-top: 14px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
     }
 
+    .summary-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
     .result-item {
       border: 1px solid var(--line);
-      background: rgba(2, 6, 23, 0.45);
+      background: rgba(2, 6, 23, 0.46);
       border-radius: 12px;
-      padding: 10px;
-      animation: fadeIn 280ms ease-out;
+      padding: 12px;
     }
 
     .result-key {
@@ -151,20 +264,75 @@
     }
 
     .result-value {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 1.05rem;
+      display: block;
       margin-top: 4px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 1rem;
     }
 
-    @media (max-width: 760px) {
+    .table-wrap {
+      margin-top: 16px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.42);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      font-size: 0.94rem;
+    }
+
+    th {
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.82);
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.2);
+      background: rgba(52, 211, 153, 0.1);
+      color: var(--success);
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 860px) {
+      .choice-grid,
       .row,
       .extra.active,
-      .results {
+      .results,
+      .summary-grid {
         grid-template-columns: 1fr;
       }
 
       .card {
         padding: 18px;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      h1 {
+        max-width: none;
       }
     }
 
@@ -180,84 +348,185 @@
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Scheduling Algorithms</h1>
-    <p class="subtitle">Choose server type, select a model, and compute queue performance instantly.</p>
+  <main class="app-shell">
+    <section id="homeView" class="card hero view active">
+      <div>
+        <h1>Queueing Calculator And Simulation (TOCI-II)</h1>
+      </div>
+      <div class="choice-grid">
+        <button type="button" class="choice-btn" data-view-target="queueView">
+          <span>Queueing Calculator</span>
+        </button>
+        <button type="button" class="choice-btn" data-view-target="simulatorView">
+          <span>Bin Hashim Simulator</span>
+        </button>
+      </div>
+    </section>
 
-    <form id="queueForm">
-      <div class="row">
-        <div class="field">
-          <label for="serverType">Server Type</label>
-          <select id="serverType" name="serverType" required>
-            <option value="single" selected>Single Server</option>
-            <option value="multi">Multi Server</option>
-          </select>
+    <section id="queueView" class="card view">
+      <div class="toolbar">
+        <div class="section-heading">
+          <h2>Queueing Calculator</h2>
         </div>
-
-        <div class="field">
-          <label for="model">Queue Model</label>
-          <select id="model" name="model" required>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="unit">Time Unit</label>
-          <select id="unit" name="unit" required>
-            <option value="sec">Seconds</option>
-            <option value="min">Minutes</option>
-            <option value="hr" selected>Hours</option>
-          </select>
-        </div>
+        <button type="button" class="back-btn" data-view-target="homeView">Back to Home</button>
       </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="lambda">Arrival Rate (lambda) per selected unit</label>
-          <input id="lambda" name="lambda" type="number" min="0" step="any" required>
+      <p class="subtitle section-subtitle">Choose server type, select a model, and compute queue performance.</p>
+
+      <form id="queueForm">
+        <div class="row">
+          <div class="field">
+            <label for="serverType">Server Type</label>
+            <select id="serverType" name="serverType" required>
+              <option value="single" selected>Single Server</option>
+              <option value="multi">Multi Server</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="model">Queue Model</label>
+            <select id="model" name="model" required></select>
+          </div>
+
+          <div class="field">
+            <label for="unit">Time Unit</label>
+            <select id="unit" name="unit" required>
+              <option value="sec">Seconds</option>
+              <option value="min">Minutes</option>
+              <option value="hr" selected>Hours</option>
+            </select>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="mu">Service Rate (mu) per selected unit</label>
-          <input id="mu" name="mu" type="number" min="0" step="any" required>
+        <div class="row">
+          <div class="field">
+            <label for="lambda">Arrival Rate (lambda) per selected unit</label>
+            <input id="lambda" name="lambda" type="number" min="0" step="any" required>
+          </div>
+
+          <div class="field">
+            <label for="mu">Service Rate (mu) per selected unit</label>
+            <input id="mu" name="mu" type="number" min="0" step="any" required>
+          </div>
         </div>
+
+        <section id="multiFields" class="extra" aria-label="Multi server specific inputs">
+          <div class="field">
+            <label for="servers">Number of Servers</label>
+            <input id="servers" name="servers" type="number" min="1" step="1">
+          </div>
+
+          <div class="field" id="cs2Field">
+            <label for="cs2">Service Variability (Cs) for M/G/c</label>
+            <input id="cs2" name="cs2" type="number" min="0" step="any">
+          </div>
+        </section>
+
+        <section id="mg1Fields" class="extra" aria-label="M G 1 specific inputs">
+          <div class="field">
+            <label for="mg1Distribution">Service Distribution</label>
+            <select id="mg1Distribution" name="mg1Distribution">
+              <option value="exponential">Exponential (mean only)</option>
+              <option value="uniform">Uniform (a, b)</option>
+              <option value="general">General (mean and variance)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="mg1MeanServiceTime" id="mg1MeanLabel">Mean Service Time in hr</label>
+            <input id="mg1MeanServiceTime" name="mg1MeanServiceTime" type="number" min="0" step="any">
+          </div>
+          <div class="field">
+            <label for="mg1Variance" id="mg1VarianceLabel">Service Time Variance in hr^2</label>
+            <input id="mg1Variance" name="mg1Variance" type="number" min="0" step="any">
+          </div>
+          <div class="field">
+            <label for="mg1MinServiceTime" id="mg1MinLabel">Min Service Time (a) in hr</label>
+            <input id="mg1MinServiceTime" name="mg1MinServiceTime" type="number" min="0" step="any">
+          </div>
+          <div class="field">
+            <label for="mg1MaxServiceTime" id="mg1MaxLabel">Max Service Time (b) in hr</label>
+            <input id="mg1MaxServiceTime" name="mg1MaxServiceTime" type="number" min="0" step="any">
+          </div>
+        </section>
+
+        <section id="gg1Fields" class="extra" aria-label="G G 1 specific inputs">
+          <div class="field">
+            <label for="ca" id="caLabel">Arrival Variation (Ca)</label>
+            <input id="ca" name="ca" type="number" min="0" step="any">
+          </div>
+
+          <div class="field">
+            <label for="cs" id="csLabel">Service Variation (Cs)</label>
+            <input id="cs" name="cs" type="number" min="0" step="any">
+          </div>
+        </section>
+
+        <button type="submit" class="submit-btn">Calculate Queue Metrics</button>
+      </form>
+
+      <div class="error" id="queueError"></div>
+      <section class="results" id="queueResults"></section>
+    </section>
+
+    <section id="simulatorView" class="card view">
+      <div class="toolbar">
+        <div>
+          <div class="eyebrow">Bin Hashim Simulator</div>
+          <h2>Pharmacy customer flow simulation</h2>
+        </div>
+        <button type="button" class="back-btn" data-view-target="homeView">Back to Home</button>
       </div>
 
-      <section id="multiFields" class="extra" aria-label="Multi server specific inputs">
-        <div class="field">
-          <label for="servers">Number of Servers</label>
-          <input id="servers" name="servers" type="number" min="1" step="1">
+      <p class="subtitle">Enter the simulation inputs below.</p>
+
+      <form id="simulatorForm">
+        <div class="row">
+          <div class="field">
+            <label for="numberOfCustomers">Number of Customers</label>
+            <input id="numberOfCustomers" name="numberOfCustomers" type="number" min="1" step="1" value="400" required>
+          </div>
+
+          <div class="field">
+            <label for="arrivalRatePerHour">Arrival Rate per Hour</label>
+            <input id="arrivalRatePerHour" name="arrivalRatePerHour" type="number" min="0.0001" step="any" value="12.28" required>
+          </div>
+
+          <div class="field">
+            <label for="serviceRatePerHour">Service Rate per Hour</label>
+            <input id="serviceRatePerHour" name="serviceRatePerHour" type="number" min="0.0001" step="any" value="6.86" required>
+          </div>
+
+          <div class="field">
+            <label for="numberOfSimServers">Number of Servers</label>
+            <input id="numberOfSimServers" name="numberOfSimServers" type="number" min="1" step="1" value="3" required>
+          </div>
         </div>
 
-        <div class="field" id="cs2Field">
-          <label for="cs2">Service Time Squared Coefficient (Cs^2) for M/G/c</label>
-          <input id="cs2" name="cs2" type="number" min="0" step="any">
-        </div>
-      </section>
+        <button type="submit" class="submit-btn" id="simulateButton">Simulate</button>
+      </form>
 
-      <section id="mg1Fields" class="extra" aria-label="M G 1 specific inputs">
-        <div class="field">
-          <label for="variance" id="varianceLabel">Service Time Variance (sigma squared), in hr^2</label>
-          <input id="variance" name="variance" type="number" min="0" step="any">
-        </div>
-      </section>
-
-      <section id="gg1Fields" class="extra" aria-label="G G 1 specific inputs">
-        <div class="field">
-          <label for="ca">Arrival Variation (Ca)</label>
-          <input id="ca" name="ca" type="number" min="0" step="any">
-        </div>
-
-        <div class="field">
-          <label for="cs">Service Variation (Cs)</label>
-          <input id="cs" name="cs" type="number" min="0" step="any">
-        </div>
-      </section>
-
-      <button type="submit">Run Simulation</button>
-    </form>
-
-    <div class="error" id="error"></div>
-    <section class="results" id="results"></section>
+      <div class="error" id="simError"></div>
+      <div id="simStatus"></div>
+      <section class="summary-grid" id="simSummary"></section>
+      <div class="table-wrap" id="simTableWrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Server</th>
+              <th>Inter Arrival (min)</th>
+              <th>Arrival (min)</th>
+              <th>Service Start (min)</th>
+              <th>Wait (min)</th>
+              <th>Service (min)</th>
+              <th>Departure (min)</th>
+              <th>Queue Length</th>
+            </tr>
+          </thead>
+          <tbody id="simTableBody"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -274,32 +543,67 @@
       ]
     };
 
+    const views = Array.from(document.querySelectorAll(".view"));
+    const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
+    const queueForm = document.getElementById("queueForm");
+    const queueError = document.getElementById("queueError");
+    const queueResults = document.getElementById("queueResults");
+
     const serverTypeSelect = document.getElementById("serverType");
     const modelSelect = document.getElementById("model");
     const multiFields = document.getElementById("multiFields");
     const cs2Field = document.getElementById("cs2Field");
     const mg1Fields = document.getElementById("mg1Fields");
     const gg1Fields = document.getElementById("gg1Fields");
-    const form = document.getElementById("queueForm");
-    const errorBox = document.getElementById("error");
-    const resultsBox = document.getElementById("results");
-
     const serversInput = document.getElementById("servers");
     const cs2Input = document.getElementById("cs2");
-    const varianceInput = document.getElementById("variance");
-    const varianceLabel = document.getElementById("varianceLabel");
+    const mg1DistributionSelect = document.getElementById("mg1Distribution");
+    const mg1MeanInput = document.getElementById("mg1MeanServiceTime");
+    const mg1VarianceInput = document.getElementById("mg1Variance");
+    const mg1MinInput = document.getElementById("mg1MinServiceTime");
+    const mg1MaxInput = document.getElementById("mg1MaxServiceTime");
+    const mg1MeanLabel = document.getElementById("mg1MeanLabel");
+    const mg1VarianceLabel = document.getElementById("mg1VarianceLabel");
+    const mg1MinLabel = document.getElementById("mg1MinLabel");
+    const mg1MaxLabel = document.getElementById("mg1MaxLabel");
+    const mg1DistributionField = mg1DistributionSelect.closest(".field");
+    const mg1MeanField = mg1MeanInput.closest(".field");
+    const mg1VarianceField = mg1VarianceInput.closest(".field");
+    const mg1MinField = mg1MinInput.closest(".field");
+    const mg1MaxField = mg1MaxInput.closest(".field");
     const caInput = document.getElementById("ca");
     const csInput = document.getElementById("cs");
+    const caLabel = document.getElementById("caLabel");
+    const csLabel = document.getElementById("csLabel");
     const unitSelect = document.getElementById("unit");
     const lambdaInput = document.getElementById("lambda");
     const muInput = document.getElementById("mu");
+
+    const simulatorForm = document.getElementById("simulatorForm");
+    const simError = document.getElementById("simError");
+    const simStatus = document.getElementById("simStatus");
+    const simSummary = document.getElementById("simSummary");
+    const simTableWrap = document.getElementById("simTableWrap");
+    const simTableBody = document.getElementById("simTableBody");
+    const simulateButton = document.getElementById("simulateButton");
 
     let currentUnit = unitSelect.value;
     const canonicalValues = {
       lambdaPerHour: null,
       muPerHour: null,
-      varianceHoursSquared: null
+      mg1MeanServiceHours: null,
+      mg1VarianceHoursSquared: null,
+      mg1MinServiceHours: null,
+      mg1MaxServiceHours: null,
+      gg1ArrivalVarHoursSquared: null,
+      gg1ServiceVarHoursSquared: null
     };
+
+    function showView(viewId) {
+      for (const view of views) {
+        view.classList.toggle("active", view.id === viewId);
+      }
+    }
 
     function timeUnitToHoursFactor(unit) {
       switch ((unit ?? "").trim().toLowerCase()) {
@@ -329,6 +633,14 @@
       return value * factor * factor;
     }
 
+    function toHours(value, unit) {
+      return value * timeUnitToHoursFactor(unit);
+    }
+
+    function fromHours(value, unit) {
+      return value / timeUnitToHoursFactor(unit);
+    }
+
     function fromHoursSquared(value, unit) {
       const factor = timeUnitToHoursFactor(unit);
       return value / (factor * factor);
@@ -354,33 +666,41 @@
       const muValue = parseInputValue(muInput);
       canonicalValues.muPerHour = muValue == null ? null : toPerHourRate(muValue, currentUnit);
 
-      const varianceValue = parseInputValue(varianceInput);
-      canonicalValues.varianceHoursSquared = varianceValue == null ? null : toHoursSquared(varianceValue, currentUnit);
+      const mg1MeanValue = parseInputValue(mg1MeanInput);
+      const mg1VarianceValue = parseInputValue(mg1VarianceInput);
+      const mg1MinValue = parseInputValue(mg1MinInput);
+      const mg1MaxValue = parseInputValue(mg1MaxInput);
+
+      canonicalValues.mg1MeanServiceHours = mg1MeanValue == null ? null : toHours(mg1MeanValue, currentUnit);
+      canonicalValues.mg1VarianceHoursSquared = mg1VarianceValue == null ? null : toHoursSquared(mg1VarianceValue, currentUnit);
+      canonicalValues.mg1MinServiceHours = mg1MinValue == null ? null : toHours(mg1MinValue, currentUnit);
+      canonicalValues.mg1MaxServiceHours = mg1MaxValue == null ? null : toHours(mg1MaxValue, currentUnit);
+
+      if (modelSelect.value === "gg1") {
+        const arrivalVarValue = parseInputValue(caInput);
+        const serviceVarValue = parseInputValue(csInput);
+        canonicalValues.gg1ArrivalVarHoursSquared = arrivalVarValue == null ? null : toHoursSquared(arrivalVarValue, currentUnit);
+        canonicalValues.gg1ServiceVarHoursSquared = serviceVarValue == null ? null : toHoursSquared(serviceVarValue, currentUnit);
+      }
     }
 
     function renderInputsFromCanonical() {
-      if (canonicalValues.lambdaPerHour == null) {
-        lambdaInput.value = "";
-      } else {
-        lambdaInput.value = formatDisplayNumber(fromPerHourRate(canonicalValues.lambdaPerHour, currentUnit));
-      }
+      lambdaInput.value = canonicalValues.lambdaPerHour == null ? "" : formatDisplayNumber(fromPerHourRate(canonicalValues.lambdaPerHour, currentUnit));
+      muInput.value = canonicalValues.muPerHour == null ? "" : formatDisplayNumber(fromPerHourRate(canonicalValues.muPerHour, currentUnit));
+      mg1MeanInput.value = canonicalValues.mg1MeanServiceHours == null ? "" : formatDisplayNumber(fromHours(canonicalValues.mg1MeanServiceHours, currentUnit));
+      mg1VarianceInput.value = canonicalValues.mg1VarianceHoursSquared == null ? "" : formatDisplayNumber(fromHoursSquared(canonicalValues.mg1VarianceHoursSquared, currentUnit));
+      mg1MinInput.value = canonicalValues.mg1MinServiceHours == null ? "" : formatDisplayNumber(fromHours(canonicalValues.mg1MinServiceHours, currentUnit));
+      mg1MaxInput.value = canonicalValues.mg1MaxServiceHours == null ? "" : formatDisplayNumber(fromHours(canonicalValues.mg1MaxServiceHours, currentUnit));
 
-      if (canonicalValues.muPerHour == null) {
-        muInput.value = "";
-      } else {
-        muInput.value = formatDisplayNumber(fromPerHourRate(canonicalValues.muPerHour, currentUnit));
-      }
-
-      if (canonicalValues.varianceHoursSquared == null) {
-        varianceInput.value = "";
-      } else {
-        varianceInput.value = formatDisplayNumber(fromHoursSquared(canonicalValues.varianceHoursSquared, currentUnit));
+      if (modelSelect.value === "gg1") {
+        caInput.value = canonicalValues.gg1ArrivalVarHoursSquared == null ? "" : formatDisplayNumber(fromHoursSquared(canonicalValues.gg1ArrivalVarHoursSquared, currentUnit));
+        csInput.value = canonicalValues.gg1ServiceVarHoursSquared == null ? "" : formatDisplayNumber(fromHoursSquared(canonicalValues.gg1ServiceVarHoursSquared, currentUnit));
       }
     }
 
-    function buildApiCandidates() {
-      const sameOrigin = `${window.location.origin}/api/calculate`;
-      const localhostFallback = "http://localhost:5000/api/calculate";
+    function buildApiCandidates(path) {
+      const sameOrigin = `${window.location.origin}${path}`;
+      const localhostFallback = `http://localhost:5000${path}`;
 
       if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
         if (window.location.port === "5000") {
@@ -391,6 +711,46 @@
       }
 
       return [sameOrigin];
+    }
+
+    async function postJson(path, payload) {
+      const candidates = buildApiCandidates(path);
+      let response = null;
+
+      for (const apiUrl of candidates) {
+        const attempt = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        response = attempt;
+        if (attempt.ok || (attempt.status !== 404 && attempt.status !== 405)) {
+          break;
+        }
+      }
+
+      const raw = await response.text();
+      let data = null;
+
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          data = null;
+        }
+      }
+
+      if (!response.ok) {
+        const message = data?.error || data?.title || (raw || `Request failed with status ${response.status}.`);
+        throw new Error(message);
+      }
+
+      if (!data) {
+        throw new Error("Server returned an empty response.");
+      }
+
+      return data;
     }
 
     function refreshModels() {
@@ -409,6 +769,7 @@
     function refreshModelInputs() {
       const serverType = serverTypeSelect.value;
       const model = modelSelect.value;
+      const mg1Distribution = mg1DistributionSelect.value;
 
       multiFields.classList.toggle("active", serverType === "multi");
       cs2Field.style.display = model === "mgc" ? "flex" : "none";
@@ -417,19 +778,49 @@
 
       serversInput.required = serverType === "multi";
       cs2Input.required = model === "mgc";
-      varianceInput.required = model === "mg1";
+      mg1MeanInput.required = model === "mg1" && (mg1Distribution === "exponential" || mg1Distribution === "general");
+      mg1VarianceInput.required = model === "mg1" && mg1Distribution === "general";
+      mg1MinInput.required = model === "mg1" && mg1Distribution === "uniform";
+      mg1MaxInput.required = model === "mg1" && mg1Distribution === "uniform";
       caInput.required = model === "gg1" || model === "ggc";
       csInput.required = model === "gg1" || model === "ggc";
+
+      if (model === "mg1") {
+        mg1DistributionField.style.display = "flex";
+        mg1MeanField.style.display = (mg1Distribution === "exponential" || mg1Distribution === "general") ? "flex" : "none";
+        mg1VarianceField.style.display = mg1Distribution === "general" ? "flex" : "none";
+        mg1MinField.style.display = mg1Distribution === "uniform" ? "flex" : "none";
+        mg1MaxField.style.display = mg1Distribution === "uniform" ? "flex" : "none";
+      } else {
+        mg1DistributionField.style.display = "none";
+        mg1MeanField.style.display = "none";
+        mg1VarianceField.style.display = "none";
+        mg1MinField.style.display = "none";
+        mg1MaxField.style.display = "none";
+      }
+
+      if (model === "mg1") {
+        mg1MeanLabel.textContent = `Mean Service Time in ${unitSelect.value}`;
+        mg1VarianceLabel.textContent = `Service Time Variance in ${unitSelect.value}^2`;
+        mg1MinLabel.textContent = `Min Service Time (a) in ${unitSelect.value}`;
+        mg1MaxLabel.textContent = `Max Service Time (b) in ${unitSelect.value}`;
+      }
+
+      if (model === "gg1") {
+        caLabel.textContent = `Arrival Variance (sigma_a^2) in ${unitSelect.value}^2`;
+        csLabel.textContent = `Service Variance (sigma_s^2) in ${unitSelect.value}^2`;
+      } else {
+        caLabel.textContent = "Arrival Variation (Ca)";
+        csLabel.textContent = "Service Variation (Cs)";
+      }
     }
 
-    function refreshVarianceLabel() {
-      varianceLabel.textContent = `Service Time Variance (sigma squared), in ${unitSelect.value}^2`;
-    }
-
-    function renderResults(data, serverType) {
+    function renderQueueResults(data, serverType) {
       const unit = data.unit ?? data.Unit ?? "hr";
       const category = serverType === "multi" ? "Multi Server" : "Single Server";
       const p0 = data.p0 ?? data.P0;
+      const meanServiceTime = data.meanServiceTime ?? data.MeanServiceTime;
+      const variance = data.variance ?? data.Variance;
       const rows = [
         ["Category", category],
         ["Model", data.model ?? data.Model],
@@ -441,20 +832,69 @@
         ["Wq", `${data.wq ?? data.Wq} ${unit}`]
       ];
 
-      resultsBox.innerHTML = rows
-        .map(([k, v]) => `
-          <article class="result-item">
-            <span class="result-key">${k}</span>
-            <span class="result-value">${v}</span>
-          </article>
-        `)
-        .join("");
+      if (meanServiceTime != null) {
+        rows.splice(4, 0, ["Mean Service Time", `${meanServiceTime} ${unit}`]);
+      }
+
+      if (variance != null) {
+        rows.splice(5, 0, ["Variance", `${variance} ${unit}^2`]);
+      }
+
+      queueResults.innerHTML = rows.map(([key, value]) => `
+        <article class="result-item">
+          <span class="result-key">${key}</span>
+          <span class="result-value">${value}</span>
+        </article>
+      `).join("");
     }
 
-    form.addEventListener("submit", async (event) => {
+    function renderSimulationResults(data) {
+      const summary = data.summary ?? data.Summary;
+      const customers = data.customers ?? data.Customers ?? [];
+      const summaryRows = [
+        ["Customers", summary.numberOfCustomers ?? summary.NumberOfCustomers],
+        ["Servers", summary.numberOfServers ?? summary.NumberOfServers],
+        ["Arrival Rate / hr", summary.arrivalRatePerHour ?? summary.ArrivalRatePerHour],
+        ["Service Rate / hr", summary.serviceRatePerHour ?? summary.ServiceRatePerHour],
+        ["Avg Waiting (min)", summary.averageWaitingTimeMinutes ?? summary.AverageWaitingTimeMinutes],
+        ["Avg System Time (min)", summary.averageSystemTimeMinutes ?? summary.AverageSystemTimeMinutes],
+        ["Avg Queue Length", summary.averageQueueLengthAtArrival ?? summary.AverageQueueLengthAtArrival],
+        ["Utilization", summary.serverUtilization ?? summary.ServerUtilization],
+        ["Simulated Time (hr)", summary.totalSimulatedTimeHours ?? summary.TotalSimulatedTimeHours]
+      ];
+
+      simSummary.innerHTML = summaryRows.map(([key, value]) => `
+        <article class="result-item">
+          <span class="result-key">${key}</span>
+          <span class="result-value">${value}</span>
+        </article>
+      `).join("");
+
+      simStatus.innerHTML = customers.length
+        ? `<div class="pill">Simulation completed for ${customers.length} customers</div>`
+        : "";
+
+      simTableBody.innerHTML = customers.map((customer) => `
+        <tr>
+          <td>${customer.customerId ?? customer.CustomerId}</td>
+          <td>${customer.assignedServer ?? customer.AssignedServer}</td>
+          <td>${customer.interArrivalTimeMinutes ?? customer.InterArrivalTimeMinutes}</td>
+          <td>${customer.arrivalTimeMinutes ?? customer.ArrivalTimeMinutes}</td>
+          <td>${customer.serviceStartTimeMinutes ?? customer.ServiceStartTimeMinutes}</td>
+          <td>${customer.waitingTimeMinutes ?? customer.WaitingTimeMinutes}</td>
+          <td>${customer.serviceTimeMinutes ?? customer.ServiceTimeMinutes}</td>
+          <td>${customer.departureTimeMinutes ?? customer.DepartureTimeMinutes}</td>
+          <td>${customer.queueLengthAtArrival ?? customer.QueueLengthAtArrival}</td>
+        </tr>
+      `).join("");
+
+      simTableWrap.style.display = customers.length ? "block" : "none";
+    }
+
+    queueForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      errorBox.textContent = "";
-      resultsBox.innerHTML = "";
+      queueError.textContent = "";
+      queueResults.innerHTML = "";
 
       const payload = {
         model: modelSelect.value,
@@ -463,56 +903,82 @@
         mu: canonicalValues.muPerHour == null ? Number(muInput.value) : fromPerHourRate(canonicalValues.muPerHour, currentUnit),
         servers: serversInput.value ? Number(serversInput.value) : null,
         cs2: cs2Input.value ? Number(cs2Input.value) : null,
-        variance: canonicalValues.varianceHoursSquared == null ? (varianceInput.value ? Number(varianceInput.value) : null) : fromHoursSquared(canonicalValues.varianceHoursSquared, currentUnit),
-        ca: caInput.value ? Number(caInput.value) : null,
-        cs: csInput.value ? Number(csInput.value) : null
+        variance: null,
+        minServiceTime: null,
+        maxServiceTime: null,
+        mg1Distribution: modelSelect.value === "mg1" ? mg1DistributionSelect.value : null,
+        mg1MeanServiceTime: modelSelect.value === "mg1" ? (
+          canonicalValues.mg1MeanServiceHours == null
+            ? (mg1MeanInput.value ? Number(mg1MeanInput.value) : null)
+            : fromHours(canonicalValues.mg1MeanServiceHours, currentUnit)
+        ) : null,
+        mg1Variance: modelSelect.value === "mg1" ? (
+          canonicalValues.mg1VarianceHoursSquared == null
+            ? (mg1VarianceInput.value ? Number(mg1VarianceInput.value) : null)
+            : fromHoursSquared(canonicalValues.mg1VarianceHoursSquared, currentUnit)
+        ) : null,
+        mg1MinServiceTime: modelSelect.value === "mg1" ? (
+          canonicalValues.mg1MinServiceHours == null
+            ? (mg1MinInput.value ? Number(mg1MinInput.value) : null)
+            : fromHours(canonicalValues.mg1MinServiceHours, currentUnit)
+        ) : null,
+        mg1MaxServiceTime: modelSelect.value === "mg1" ? (
+          canonicalValues.mg1MaxServiceHours == null
+            ? (mg1MaxInput.value ? Number(mg1MaxInput.value) : null)
+            : fromHours(canonicalValues.mg1MaxServiceHours, currentUnit)
+        ) : null,
+        ca: null,
+        cs: null
+      };
+
+      if (modelSelect.value === "gg1") {
+        payload.ca = canonicalValues.gg1ArrivalVarHoursSquared == null
+          ? (caInput.value ? Number(caInput.value) : null)
+          : fromHoursSquared(canonicalValues.gg1ArrivalVarHoursSquared, currentUnit);
+        payload.cs = canonicalValues.gg1ServiceVarHoursSquared == null
+          ? (csInput.value ? Number(csInput.value) : null)
+          : fromHoursSquared(canonicalValues.gg1ServiceVarHoursSquared, currentUnit);
+      } else {
+        payload.ca = caInput.value ? Number(caInput.value) : null;
+        payload.cs = csInput.value ? Number(csInput.value) : null;
+      }
+
+      try {
+        const data = await postJson("/api/calculate", payload);
+        renderQueueResults(data, serverTypeSelect.value);
+      } catch (error) {
+        queueError.textContent = error.message;
+      }
+    });
+
+    simulatorForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      simError.textContent = "";
+      simStatus.innerHTML = '<div class="pill">Running simulation...</div>';
+      simulateButton.disabled = true;
+      simulateButton.textContent = "Simulating...";
+
+      const payload = {
+        numberOfCustomers: Number(document.getElementById("numberOfCustomers").value),
+        arrivalRatePerHour: Number(document.getElementById("arrivalRatePerHour").value),
+        serviceRatePerHour: Number(document.getElementById("serviceRatePerHour").value),
+        numberOfServers: Number(document.getElementById("numberOfSimServers").value)
       };
 
       try {
-        const apiCandidates = buildApiCandidates();
-        let res = null;
-        for (const apiUrl of apiCandidates) {
-          const attempt = await fetch(apiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-
-          if (attempt.ok || (attempt.status !== 404 && attempt.status !== 405)) {
-            res = attempt;
-            break;
-          }
-
-          res = attempt;
-        }
-
-        const raw = await res.text();
-        let data = null;
-
-        if (raw) {
-          try {
-            data = JSON.parse(raw);
-          } catch {
-            data = null;
-          }
-        }
-
-        if (!res.ok) {
-          const message =
-            data?.error ||
-            data?.title ||
-            (raw ? raw : `Request failed with status ${res.status}.`);
-          throw new Error(message);
-        }
-
-        if (!data) {
-          throw new Error("Server returned an empty response.");
-        }
-
-        renderResults(data, serverTypeSelect.value);
-      } catch (err) {
-        errorBox.textContent = err.message;
+        const data = await postJson("/api/simulation/run", payload);
+        renderSimulationResults(data);
+      } catch (error) {
+        simStatus.innerHTML = "";
+        simError.textContent = error.message;
+      } finally {
+        simulateButton.disabled = false;
+        simulateButton.textContent = "Simulate";
       }
+    });
+
+    viewButtons.forEach((button) => {
+      button.addEventListener("click", () => showView(button.dataset.viewTarget));
     });
 
     serverTypeSelect.addEventListener("change", () => {
@@ -521,16 +987,30 @@
     });
     lambdaInput.addEventListener("input", syncCanonicalFromInputs);
     muInput.addEventListener("input", syncCanonicalFromInputs);
-    varianceInput.addEventListener("input", syncCanonicalFromInputs);
+    mg1DistributionSelect.addEventListener("change", () => {
+      refreshModelInputs();
+      syncCanonicalFromInputs();
+      renderInputsFromCanonical();
+    });
+    mg1MeanInput.addEventListener("input", syncCanonicalFromInputs);
+    mg1VarianceInput.addEventListener("input", syncCanonicalFromInputs);
+    mg1MinInput.addEventListener("input", syncCanonicalFromInputs);
+    mg1MaxInput.addEventListener("input", syncCanonicalFromInputs);
+    caInput.addEventListener("input", syncCanonicalFromInputs);
+    csInput.addEventListener("input", syncCanonicalFromInputs);
     unitSelect.addEventListener("change", () => {
       currentUnit = unitSelect.value;
       renderInputsFromCanonical();
-      refreshVarianceLabel();
+      refreshModelInputs();
     });
-    modelSelect.addEventListener("change", refreshModelInputs);
+    modelSelect.addEventListener("change", () => {
+      refreshModelInputs();
+      syncCanonicalFromInputs();
+      renderInputsFromCanonical();
+    });
+
     refreshModels();
     syncCanonicalFromInputs();
-    refreshVarianceLabel();
     refreshModelInputs();
   </script>
 </body>

@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Simulator\Program.cs" />
+    <Compile Remove="Simulator\obj\**\*.cs" />
+    <Compile Remove="Simulator\bin\**\*.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,93 +1,88 @@
 using System;
 
-namespace SingleServerModels
+class GG1Queue
 {
-    public class GG1
+    // Convert rates to per minute
+    static double ConvertToMinutes(double value, int unit)
     {
-        // Helper methods for unit conversion
-        private static double ToHours(double value, string unit)
+        if (unit == 1) return value / 60;   // per hour → per minute
+        if (unit == 2) return value;        // per minute
+        if (unit == 3) return value * 60;   // per second → per minute
+        return value;
+    }
+
+    static void Main()
+    {
+        // 🔹 STEP 0: UNIT SELECTION
+        Console.WriteLine("Select Time Unit:");
+        Console.WriteLine("1. Hours");
+        Console.WriteLine("2. Minutes");
+        Console.WriteLine("3. Seconds");
+        Console.Write("Enter choice: ");
+        int unit = Convert.ToInt32(Console.ReadLine());
+
+        // 🔹 INPUT
+        Console.Write("Enter λ (arrival rate): ");
+        double lambda = Convert.ToDouble(Console.ReadLine());
+
+        Console.Write("Enter μ (service rate): ");
+        double mu = Convert.ToDouble(Console.ReadLine());
+
+        Console.Write("Enter variance of ARRIVAL (σa^2): ");
+        double varArrival = Convert.ToDouble(Console.ReadLine());
+
+        Console.Write("Enter variance of SERVICE (σs^2): ");
+        double varService = Convert.ToDouble(Console.ReadLine());
+
+        // Convert rates
+        lambda = ConvertToMinutes(lambda, unit);
+        mu = ConvertToMinutes(mu, unit);
+
+        // 🔹 STEP 1: Traffic Intensity
+        double rho = lambda / mu;
+
+        if (rho >= 1)
         {
-            switch (unit.ToLower())
-            {
-                case "sec":
-                case "s":
-                    return value / 3600.0;
-                case "min":
-                case "m":
-                    return value / 60.0;
-                case "hr":
-                case "h":
-                    return value;
-                default:
-                    return value; // default assume hours
-            }
+            Console.WriteLine("\nSystem is UNSTABLE (ρ ≥ 1)");
+            return;
         }
 
-        private static double FromHours(double value, string unit)
-        {
-            switch (unit.ToLower())
-            {
-                case "sec":
-                case "s":
-                    return value * 3600.0;
-                case "min":
-                case "m":
-                    return value * 60.0;
-                case "hr":
-                case "h":
-                    return value;
-                default:
-                    return value; // default assume hours
-            }
-        }
+        // 🔹 STEP 2: Ca^2 and Cs^2
+        double meanInterarrival = 1 / lambda;
+        double meanService = 1 / mu;
 
-        public static void Solve()
-        {
-            Console.WriteLine("\n--- G/G/1 Model ---");
+        double Ca2 = varArrival / Math.Pow(meanInterarrival, 2);
+        double Cs2 = varService / Math.Pow(meanService, 2);
 
-            // Ask user for unit
-            Console.Write("Select time unit (sec/min/hr): ");
-            string unit = Console.ReadLine();
+        // 🔹 STEP 3: Lq (G/G/1 formula)
+        double rho2 = Math.Pow(rho, 2);
 
-            // Input rates in chosen unit
-            Console.Write($"Enter Arrival Rate (λ) per {unit}: ");
-            double lambda = Convert.ToDouble(Console.ReadLine());
-            Console.Write($"Enter Service Rate (μ) per {unit}: ");
-            double mu = Convert.ToDouble(Console.ReadLine());
-            Console.Write("Enter Arrival Variation (Ca): ");
-            double Ca = Convert.ToDouble(Console.ReadLine());
-            Console.Write("Enter Service Variation (Cs): ");
-            double Cs = Convert.ToDouble(Console.ReadLine());
+        double numerator = rho2 * (1 + Cs2) * (Ca2 + rho2 * Cs2);
+        double denominator = 2 * (1 - rho) * (1 + rho2 * Cs2);
 
-            // Convert λ and μ to hours internally
-            lambda = ToHours(lambda, unit);
-            mu = ToHours(mu, unit);
+        double Lq = numerator / denominator;
 
-            double rho = lambda / mu;
-            double P0 = 1 - rho;
+        // 🔹 STEP 4: Wq
+        double Wq = Lq / lambda;
 
-            if (rho >= 1)
-            {
-                Console.WriteLine("System is Unstable!");
-                return;
-            }
+        // 🔹 STEP 5: W
+        double W = Wq + meanService;
 
-            double Wq = (rho / (1 - rho)) * ((Ca * Ca + Cs * Cs) / 2) * (1 / mu);
-            double Lq = lambda * Wq;
-            double W = Wq + (1 / mu);
-            double L = lambda * W;
+        // 🔹 STEP 6: L
+        double L = lambda * W;
 
-            // Convert W and Wq back to chosen unit
-            W = FromHours(W, unit);
-            Wq = FromHours(Wq, unit);
+        // 🔹 STEP 7: P0
+        double P0 = 1 - rho;
 
-            Console.WriteLine("\n--- Results ---");
-            Console.WriteLine("Utilization (ρ): " + Math.Round(rho, 3));
-            Console.WriteLine("P0 (Idle Probability): " + Math.Round(P0, 3));
-            Console.WriteLine("L  : " + Math.Round(L, 3));
-            Console.WriteLine("Lq : " + Math.Round(Lq, 3));
-            Console.WriteLine("W  : " + Math.Round(W, 3) + " " + unit);
-            Console.WriteLine("Wq : " + Math.Round(Wq, 3) + " " + unit);
-        }
+        // OUTPUT
+        Console.WriteLine("\n===== G/G/1 Results =====");
+        Console.WriteLine($"Traffic Intensity (ρ): {rho:F4}");
+        Console.WriteLine($"Ca^2: {Ca2:F4}");
+        Console.WriteLine($"Cs^2: {Cs2:F4}");
+        Console.WriteLine($"Lq: {Lq:F4}");
+        Console.WriteLine($"Wq: {Wq:F4}");
+        Console.WriteLine($"W: {W:F4}");
+        Console.WriteLine($"L: {L:F4}");
+        Console.WriteLine($"P0: {P0:F4}");
     }
 }
