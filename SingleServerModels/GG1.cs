@@ -64,6 +64,7 @@ namespace SingleServerModels
             mu = ToHours(mu, unit);
 
             double rho = lambda / mu;
+            double P0 = 1 - rho;
 
             if (rho >= 1)
             {
@@ -82,6 +83,7 @@ namespace SingleServerModels
 
             Console.WriteLine("\n--- Results ---");
             Console.WriteLine("Utilization (ρ): " + Math.Round(rho, 3));
+            Console.WriteLine("P0 (Idle Probability): " + Math.Round(P0, 3));
             Console.WriteLine("L  : " + Math.Round(L, 3));
             Console.WriteLine("Lq : " + Math.Round(Lq, 3));
             Console.WriteLine("W  : " + Math.Round(W, 3) + " " + unit);

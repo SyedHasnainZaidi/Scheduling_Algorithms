@@ -50,6 +50,13 @@ D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\Simulato
 D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.runtimeconfig.json
 D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.staticwebassets.endpoints.json
 D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_buildcheck\SimulatorProject.staticwebassets.runtime.json
-D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\compressed\g7db6acdca-{0}-8luipy1v9q-8luipy1v9q.gz
 D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\SimulatorProject.sourcelink.json
-D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\compressed\g7db6acdca-{0}-v4tr81ce17-v4tr81ce17.gz
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\web.config
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\SimulatorProject.runtimeconfig.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\SimulatorProject.staticwebassets.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\_buildcheck\SimulatorProject.deps.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\_buildcheck\SimulatorProject.runtimeconfig.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\_buildcheck\SimulatorProject.staticwebassets.endpoints.json
+D:\Home\SimulatorProject\SimulatorProject\bin\Debug\net10.0\_azure_publish_test\_buildcheck\SimulatorProject.staticwebassets.runtime.json
+D:\Home\SimulatorProject\SimulatorProject\obj\Debug\net10.0\compressed\g7db6acdca-{0}-lqcxc7766p-lqcxc7766p.gz

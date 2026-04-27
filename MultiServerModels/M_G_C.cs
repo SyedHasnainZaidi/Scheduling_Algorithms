@@ -75,7 +75,7 @@ namespace doubleServerModels
             W = FromHours(W, unit);
             Wq = FromHours(Wq, unit);
 
-            Console.WriteLine($"ρ = {Math.Round(rho,3)}, L = {Math.Round(L,3)}, Lq = {Math.Round(Lq,3)}, W = {Math.Round(W,3)} {unit}, Wq = {Math.Round(Wq,3)} {unit}");
+            Console.WriteLine($"ρ = {Math.Round(rho,3)}, P0 = N/A, L = {Math.Round(L,3)}, Lq = {Math.Round(Lq,3)}, W = {Math.Round(W,3)} {unit}, Wq = {Math.Round(Wq,3)} {unit}");
         }
     }
 }

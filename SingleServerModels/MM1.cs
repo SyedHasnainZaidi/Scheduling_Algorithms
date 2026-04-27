@@ -66,6 +66,7 @@ namespace SingleServerModels
             }
 
             double rho = lambda / mu;
+            double P0 = 1 - rho;
             double L = lambda / (mu - lambda);
             double Lq = (lambda * lambda) / (mu * (mu - lambda));
             double W = 1 / (mu - lambda);
@@ -75,7 +76,7 @@ namespace SingleServerModels
             W = FromHours(W, unit);
             Wq = FromHours(Wq, unit);
 
-            Console.WriteLine($"ρ = {Math.Round(rho,3)}, L = {Math.Round(L,3)}, Lq = {Math.Round(Lq,3)}, W = {Math.Round(W,3)} {unit}, Wq = {Math.Round(Wq,3)} {unit}");
+            Console.WriteLine($"ρ = {Math.Round(rho,3)}, P0 = {Math.Round(P0,3)}, L = {Math.Round(L,3)}, Lq = {Math.Round(Lq,3)}, W = {Math.Round(W,3)} {unit}, Wq = {Math.Round(Wq,3)} {unit}");
         }
     }
 }

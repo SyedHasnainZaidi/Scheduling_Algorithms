@@ -86,7 +86,12 @@ namespace doubleServerModels
             W = FromHours(W, unit);
             Wq = FromHours(Wq, unit);
 
-            Console.WriteLine($"ρ = {Math.Round(rho,3)}, L = {Math.Round(L,3)}, Lq = {Math.Round(Lq,3)}, W = {Math.Round(W,3)} {unit}, Wq = {Math.Round(Wq,3)} {unit}");
+            Console.WriteLine($"Utilization (ρ) = {Math.Round(rho,3)}");
+            Console.WriteLine($"P0 (Idle Probability) = {Math.Round(P0,3)}");
+            Console.WriteLine($"L (System) = {Math.Round(L,3)}");
+            Console.WriteLine($"Lq (Queue) = {Math.Round(Lq,3)}");
+            Console.WriteLine($"W (System) = {Math.Round(W,3)} {unit}");
+            Console.WriteLine($"Wq (Queue) = {Math.Round(Wq,3)} {unit}");
         }
     }
 }

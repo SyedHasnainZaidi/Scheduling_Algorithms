@@ -236,7 +236,7 @@
 
       <section id="mg1Fields" class="extra" aria-label="M G 1 specific inputs">
         <div class="field">
-          <label for="variance">Service Time Variance (sigma squared), in hr^2</label>
+          <label for="variance" id="varianceLabel">Service Time Variance (sigma squared), in hr^2</label>
           <input id="variance" name="variance" type="number" min="0" step="any">
         </div>
       </section>
@@ -269,7 +269,8 @@
       ],
       multi: [
         { value: "mms", label: "M/M/s" },
-        { value: "mgc", label: "M/G/c" }
+        { value: "mgc", label: "M/G/c" },
+        { value: "ggc", label: "G/G/c" }
       ]
     };
 
@@ -286,8 +287,96 @@
     const serversInput = document.getElementById("servers");
     const cs2Input = document.getElementById("cs2");
     const varianceInput = document.getElementById("variance");
+    const varianceLabel = document.getElementById("varianceLabel");
     const caInput = document.getElementById("ca");
     const csInput = document.getElementById("cs");
+    const unitSelect = document.getElementById("unit");
+    const lambdaInput = document.getElementById("lambda");
+    const muInput = document.getElementById("mu");
+
+    let currentUnit = unitSelect.value;
+    const canonicalValues = {
+      lambdaPerHour: null,
+      muPerHour: null,
+      varianceHoursSquared: null
+    };
+
+    function timeUnitToHoursFactor(unit) {
+      switch ((unit ?? "").trim().toLowerCase()) {
+        case "sec":
+        case "s":
+          return 1 / 3600;
+        case "min":
+        case "m":
+          return 1 / 60;
+        case "hr":
+        case "h":
+        default:
+          return 1;
+      }
+    }
+
+    function toPerHourRate(value, unit) {
+      return value / timeUnitToHoursFactor(unit);
+    }
+
+    function fromPerHourRate(value, unit) {
+      return value * timeUnitToHoursFactor(unit);
+    }
+
+    function toHoursSquared(value, unit) {
+      const factor = timeUnitToHoursFactor(unit);
+      return value * factor * factor;
+    }
+
+    function fromHoursSquared(value, unit) {
+      const factor = timeUnitToHoursFactor(unit);
+      return value / (factor * factor);
+    }
+
+    function parseInputValue(input) {
+      if (!input.value) {
+        return null;
+      }
+
+      const parsed = Number(input.value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function formatDisplayNumber(value) {
+      return String(Number(value.toPrecision(12)));
+    }
+
+    function syncCanonicalFromInputs() {
+      const lambdaValue = parseInputValue(lambdaInput);
+      canonicalValues.lambdaPerHour = lambdaValue == null ? null : toPerHourRate(lambdaValue, currentUnit);
+
+      const muValue = parseInputValue(muInput);
+      canonicalValues.muPerHour = muValue == null ? null : toPerHourRate(muValue, currentUnit);
+
+      const varianceValue = parseInputValue(varianceInput);
+      canonicalValues.varianceHoursSquared = varianceValue == null ? null : toHoursSquared(varianceValue, currentUnit);
+    }
+
+    function renderInputsFromCanonical() {
+      if (canonicalValues.lambdaPerHour == null) {
+        lambdaInput.value = "";
+      } else {
+        lambdaInput.value = formatDisplayNumber(fromPerHourRate(canonicalValues.lambdaPerHour, currentUnit));
+      }
+
+      if (canonicalValues.muPerHour == null) {
+        muInput.value = "";
+      } else {
+        muInput.value = formatDisplayNumber(fromPerHourRate(canonicalValues.muPerHour, currentUnit));
+      }
+
+      if (canonicalValues.varianceHoursSquared == null) {
+        varianceInput.value = "";
+      } else {
+        varianceInput.value = formatDisplayNumber(fromHoursSquared(canonicalValues.varianceHoursSquared, currentUnit));
+      }
+    }
 
     function buildApiCandidates() {
       const sameOrigin = `${window.location.origin}/api/calculate`;
@@ -324,22 +413,28 @@
       multiFields.classList.toggle("active", serverType === "multi");
       cs2Field.style.display = model === "mgc" ? "flex" : "none";
       mg1Fields.classList.toggle("active", model === "mg1");
-      gg1Fields.classList.toggle("active", model === "gg1");
+      gg1Fields.classList.toggle("active", model === "gg1" || model === "ggc");
 
       serversInput.required = serverType === "multi";
       cs2Input.required = model === "mgc";
       varianceInput.required = model === "mg1";
-      caInput.required = model === "gg1";
-      csInput.required = model === "gg1";
+      caInput.required = model === "gg1" || model === "ggc";
+      csInput.required = model === "gg1" || model === "ggc";
+    }
+
+    function refreshVarianceLabel() {
+      varianceLabel.textContent = `Service Time Variance (sigma squared), in ${unitSelect.value}^2`;
     }
 
     function renderResults(data, serverType) {
       const unit = data.unit ?? data.Unit ?? "hr";
       const category = serverType === "multi" ? "Multi Server" : "Single Server";
+      const p0 = data.p0 ?? data.P0;
       const rows = [
         ["Category", category],
         ["Model", data.model ?? data.Model],
         ["Utilization (rho)", data.rho ?? data.Rho],
+        ["P0 (Idle Probability)", p0 == null ? "N/A" : p0],
         ["L", data.l ?? data.L],
         ["Lq", data.lq ?? data.Lq],
         ["W", `${data.w ?? data.W} ${unit}`],
@@ -363,12 +458,12 @@
 
       const payload = {
         model: modelSelect.value,
-        unit: document.getElementById("unit").value,
-        lambda: Number(document.getElementById("lambda").value),
-        mu: Number(document.getElementById("mu").value),
+        unit: currentUnit,
+        lambda: canonicalValues.lambdaPerHour == null ? Number(lambdaInput.value) : fromPerHourRate(canonicalValues.lambdaPerHour, currentUnit),
+        mu: canonicalValues.muPerHour == null ? Number(muInput.value) : fromPerHourRate(canonicalValues.muPerHour, currentUnit),
         servers: serversInput.value ? Number(serversInput.value) : null,
         cs2: cs2Input.value ? Number(cs2Input.value) : null,
-        variance: varianceInput.value ? Number(varianceInput.value) : null,
+        variance: canonicalValues.varianceHoursSquared == null ? (varianceInput.value ? Number(varianceInput.value) : null) : fromHoursSquared(canonicalValues.varianceHoursSquared, currentUnit),
         ca: caInput.value ? Number(caInput.value) : null,
         cs: csInput.value ? Number(csInput.value) : null
       };
@@ -424,8 +519,18 @@
       refreshModels();
       refreshModelInputs();
     });
+    lambdaInput.addEventListener("input", syncCanonicalFromInputs);
+    muInput.addEventListener("input", syncCanonicalFromInputs);
+    varianceInput.addEventListener("input", syncCanonicalFromInputs);
+    unitSelect.addEventListener("change", () => {
+      currentUnit = unitSelect.value;
+      renderInputsFromCanonical();
+      refreshVarianceLabel();
+    });
     modelSelect.addEventListener("change", refreshModelInputs);
     refreshModels();
+    syncCanonicalFromInputs();
+    refreshVarianceLabel();
     refreshModelInputs();
   </script>
 </body>
